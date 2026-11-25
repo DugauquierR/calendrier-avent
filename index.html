@@ -2582,22 +2582,15 @@ async function debloquerCadeaux() {
 
     if (
         !APPS_SCRIPT_URL ||
-        APPS_SCRIPT_URL.includes(
-            "https://script.google.com/macros/s/AKfycbzv46E7l3wh1kfEvHWB7ikp46Z71In4eEZpbQuQtaeDkEq2T2K8wD09wvx76AVbtavH/exec"
-        )
+        APPS_SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbzv46E7l3wh1kfEvHWB7ikp46Z71In4eEZpbQuQtaeDkEq2T2K8wD09wvx76AVbtavH/exec")
     ) {
-
-
         status.className =
             "status-error";
-
 
         status.textContent =
             "❌ L'URL Google Apps Script n'est pas configurée.";
 
-
         return;
-
     }
 
 
