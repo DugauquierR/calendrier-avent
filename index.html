@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Calendrier de l'Avent</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        :root {
+            --fond-page: #101010;
+            --fond-carte: #1e1e1e;
+            --fond-cadeau: #2b2b2b;
+            --bordure: #414141;
+            --rouge-noel: #ff1f35;
+            --vert-noel: #009b3a;
+            --vert-clair: #81c784;
+            --texte: #ffffff;
+            --texte-secondaire: #bdbdbd;
+            --erreur: #ff7080;
+        }
+
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #232323 0,
+                    var(--fond-page) 55%
+                );
+
+            color: var(--texte);
+
+            margin: 0;
+
+            padding: 18px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+        }
+
+
+        .card {
+
+            background: var(--fond-carte);
+
+            border-radius: 22px;
+
+            padding: 22px;
+
+            width: 100%;
+
+            max-width: 470px;
+
+            text-align: center;
+
+            border: 1px solid #353535;
+
+            box-shadow:
+                0 16px 45px rgba(0, 0, 0, 0.55);
+        }
+
+
+        .jour-badge {
+
+            display: inline-block;
+
+            padding: 7px 14px;
+
+            margin-bottom: 12px;
+
+            color: white;
+
+            background: var(--rouge-noel);
+
+            border-radius: 999px;
+
+            font-size: 0.85rem;
+
+            font-weight: bold;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        h1 {
+
+            margin: 0;
+
+            color: var(--texte);
+
+            font-size: 1.55rem;
+
+            line-height: 1.25;
+        }
+
+
+        .subtitle {
+
+            color: var(--texte-secondaire);
+
+            font-size: 0.95rem;
+
+            line-height: 1.45;
+
+            margin-top: 10px;
+
+            margin-bottom: 18px;
+        }
+
+
+        /* ==================================================
+           ZONE COMPLETE A GRATTER
+           ================================================== */
+
+        .scratch-container {
+
+            position: relative;
+
+            width: 100%;
+
+            min-height: 440px;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+            background: #252525;
+
+            border: 1px solid var(--bordure);
+
+            box-shadow:
+                inset 0 0 20px rgba(0, 0, 0, 0.35);
+        }
+
+
+        /* ==================================================
+           CONTENU CACHE
+           ================================================== */
+
+        #cadeauxContainer {
+
+            position: relative;
+
+            z-index: 1;
+
+            width: 100%;
+
+            min-height: 440px;
+
+            padding: 18px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+        }
+
+
+        .cadeaux-titre {
+
+            margin: 0 0 15px 0;
+
+            color: white;
+
+            font-size: 1.1rem;
+        }
+
+
+        .cadeaux-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 10px;
+
+            width: 100%;
+        }
+
+
+        /* ==================================================
+           CARTE D'UN CADEAU
+           ================================================== */
+
+        .cadeau {
+
+            display: flex;
+
+            flex-direction: column;
+
+            background: var(--fond-cadeau);
+
+            border: 1px solid var(--bordure);
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            min-width: 0;
+
+            box-shadow:
+                0 5px 14px rgba(0, 0, 0, 0.25);
+        }
+
+
+        .cadeau-image-wrapper {
+
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 2 / 3;
+
+            overflow: hidden;
+
+            background: #383838;
+        }
+
+
+        .cadeau-image {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            transition:
+                transform 0.25s ease;
+        }
+
+
+        .cadeau:hover .cadeau-image {
+
+            transform: scale(1.04);
+        }
+
+
+        .cadeau-contenu {
+
+            padding: 9px 7px 10px 7px;
+
+            min-width: 0;
+        }
+
+
+        .cadeau-type {
+
+            color: var(--vert-clair);
+
+            font-size: 0.68rem;
+
+            font-weight: bold;
+
+            letter-spacing: 0.5px;
+
+            margin-bottom: 5px;
+
+            text-transform: uppercase;
+        }
+
+
+        .cadeau-titre {
+
+            color: white;
+
+            font-size: 0.78rem;
+
+            font-weight: bold;
+
+            line-height: 1.25;
+
+            overflow-wrap: anywhere;
+        }
+
+
+        .aucun-cadeau {
+
+            color: var(--texte-secondaire);
+
+            padding: 25px;
+
+            line-height: 1.5;
+        }
+
+
+        /* ==================================================
+           CANVAS DE GRATTAGE
+           ================================================== */
+
+        #scratchCanvas {
+
+            position: absolute;
+
+            inset: 0;
+
+            z-index: 2;
+
+            width: 100%;
+
+            height: 100%;
+
+            cursor: crosshair;
+
+            touch-action: none;
+        }
+
+
+        /* ==================================================
+           PROGRESSION
+           ================================================== */
+
+        .progression {
+
+            margin-top: 13px;
+        }
+
+
+        .progression-info {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            color: var(--texte-secondaire);
+
+            font-size: 0.78rem;
+
+            margin-bottom: 6px;
+        }
+
+
+        .progression-barre {
+
+            height: 7px;
+
+            background: #343434;
+
+            border-radius: 999px;
+
+            overflow: hidden;
+        }
+
+
+        #progressionValeur {
+
+            width: 0%;
+
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #d4af37,
+                    #ffd95a
+                );
+
+            border-radius: 999px;
+
+            transition: width 0.15s ease;
+        }
+
+
+        /* ==================================================
+           BOUTON
+           ================================================== */
+
+        .btn {
+
+            display: none;
+
+            width: 100%;
+
+            margin-top: 16px;
+
+            padding: 15px 18px;
+
+            background: var(--vert-noel);
+
+            color: white;
+
+            border: none;
+
+            border-radius: 12px;
+
+            font-size: 1rem;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                opacity 0.2s ease,
+                transform 0.1s ease;
+        }
+
+
+        .btn:hover {
+
+            background: #00b444;
+        }
+
+
+        .btn:active {
+
+            transform: scale(0.99);
+        }
+
+
+        .btn:disabled {
+
+            background: #555;
+
+            opacity: 0.8;
+
+            cursor: wait;
+        }
+
+
+        /* ==================================================
+           MESSAGE DE STATUT
+           ================================================== */
+
+        #status {
+
+            min-height: 22px;
+
+            margin-top: 14px;
+
+            font-size: 0.9rem;
+
+            line-height: 1.45;
+        }
+
+
+        .status-success {
+
+            color: var(--vert-clair);
+        }
+
+
+        .status-error {
+
+            color: var(--erreur);
+        }
+
+
+        .status-info {
+
+            color: #dddddd;
+        }
+
+
+        /* ==================================================
+           BANDEAU DU MODE TEST
+           ================================================== */
+
+        #modeTest {
+
+            display: none;
+
+            margin-top: 15px;
+
+            padding: 9px 12px;
+
+            color: #ffe8a3;
+
+            background: #493d1e;
+
+            border: 1px solid #725f2e;
+
+            border-radius: 10px;
+
+            font-size: 0.78rem;
+
+            line-height: 1.4;
+        }
+
+
+        /* ==================================================
+           TELEPHONE
+           ================================================== */
+
+        @media (max-width: 480px) {
+
+            body {
+
+                padding: 10px;
+
+                align-items: flex-start;
+            }
+
+
+            .card {
+
+                padding: 16px;
+
+                border-radius: 17px;
+            }
+
+
+            h1 {
+
+                font-size: 1.35rem;
+            }
+
+
+            .scratch-container {
+
+                min-height: 470px;
+            }
+
+
+            #cadeauxContainer {
+
+                min-height: 470px;
+
+                padding: 13px;
+            }
+
+
+            .cadeaux-grid {
+
+                gap: 7px;
+            }
+
+
+            .cadeau-contenu {
+
+                padding:
+                    8px 5px
+                    9px 5px;
+            }
+
+
+            .cadeau-type {
+
+                font-size: 0.6rem;
+            }
+
+
+            .cadeau-titre {
+
+                font-size: 0.7rem;
+            }
+
+        }
+
+
+        /* ==================================================
+           SI PLUS DE TROIS CADEAUX
+           ================================================== */
+
+        .cadeaux-grid.nombre-4 {
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+
+
+        .cadeaux-grid.nombre-5,
+        .cadeaux-grid.nombre-6 {
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <main class="card">
+
+
+        <div
+            id="jourBadge"
+            class="jour-badge"
+        >
+            JOUR 1
+        </div>
+
+
+        <h1 id="titreJour">
+
+            🎄 Surprise du jour 🎁
+
+        </h1>
+
+
+        <div class="subtitle">
+
+            Gratte la surface pour découvrir les cadeaux du jour.
+
+        </div>
+
+
+
+        <!-- ==================================================
+             ZONE DE GRATTAGE
+             ================================================== -->
+
+        <section
+            id="scratchContainer"
+            class="scratch-container"
+        >
+
+
+            <div id="cadeauxContainer">
+
+
+                <h2 class="cadeaux-titre">
+
+                    🎁 Tes cadeaux
+
+                </h2>
+
+
+                <div
+                    id="cadeauxGrid"
+                    class="cadeaux-grid"
+                >
+                </div>
+
+
+            </div>
+
+
+            <canvas
+                id="scratchCanvas"
+                width="900"
+                height="1000"
+                aria-label="Zone à gratter"
+            >
+            </canvas>
+
+
+        </section>
+
+
+
+        <!-- ==================================================
+             PROGRESSION
+             ================================================== -->
+
+        <div
+            id="progression"
+            class="progression"
+        >
+
+
+            <div class="progression-info">
+
+                <span>Progression du grattage</span>
+
+                <span id="progressionTexte">
+                    0 %
+                </span>
+
+            </div>
+
+
+            <div class="progression-barre">
+
+                <div id="progressionValeur">
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             BOUTON
+             ================================================== -->
+
+        <button
+            id="addBtn"
+            class="btn"
+            type="button"
+        >
+
+            🎁 Débloquer mes cadeaux
+
+        </button>
+
+
+
+        <div
+            id="status"
+            aria-live="polite"
+        >
+        </div>
+
+
+
+        <div id="modeTest">
+
+            🧪 Mode simulation activé : le jour 1 est forcé.
+
+        </div>
+
+
+    </main>
+
+
+
+<script>
+
+
+// ======================================================
+// 1. CONFIGURATION GENERALE
+// ======================================================
+
+
+// ------------------------------------------------------
+// URL GOOGLE APPS SCRIPT
+// ------------------------------------------------------
+//
+// Remplace cette valeur par l'URL /exec
+// qui fonctionne déjà dans ta version actuelle.
+//
+
+const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbzv46E7l3wh1kfEvHWB7ikp46Z71In4eEZpbQuQtaeDkEq2T2K8wD09wvx76AVbtavH/exec";
+
+
+
+// ------------------------------------------------------
+// MODE SIMULATION
+// ------------------------------------------------------
+//
+// true : force le jour indiqué dans JOUR_SIMULE.
+//
+// false : utilise le jour envoyé dans l'URL.
+//
+// Exemple d'URL :
+// index.html?jour=12
+//
+
+const MODE_SIMULATION = true;
+
+const JOUR_SIMULE = 1;
+
+
+
+// ------------------------------------------------------
+// SEUIL DE REVELATION
+// ------------------------------------------------------
+//
+// Le bouton apparaît lorsque 75 % du calque
+// est gratté.
+//
+// 0.75 = 75 %
+// 0.80 = 80 %
+//
+
+const SEUIL_GRATTAGE = 0.75;
+
+
+
+// ======================================================
+// 2. CONFIGURATION DES 24 JOURS
+// ======================================================
+//
+// Remplace progressivement les titres et les images.
+//
+// Les chemins sont relatifs à index.html.
+//
+// Exemple :
+// images/jour01-roman.jpg
+//
+// Tu peux ajouter ou supprimer des cadeaux.
+// ======================================================
+
+
+const CALENDRIER = {
+
+
+    // ==================================================
+    // JOUR 1
+    // ==================================================
+
+    1: [
+
+        {
+            type: "Livres",
+            titre: "Le Sorceleur - L'Intégrale - Andrzej Sapkowski",
+            image: "images/Le Sorceleur - L_Integrale - Andrzej Sapkowski.png"
+        },
+
+        {
+            type: "Roman graphique",
+            titre: "La Guerre Des Clans Le Vent du Changement - Erin Hunter",
+            image: "images/La Guerre Des Clans Le Vent du Changement - Erin Hunter.png"
+        },
+
+        {
+            type: "Jeux",
+            titre: "Application personnelle bibliothèques",
+            image: "images/bibliotheque.png"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 2
+    // ==================================================
+
+    2: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 2",
+            image: "images/jour02-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 2",
+            image: "images/jour02-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 2",
+            image: "images/jour02-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 3
+    // ==================================================
+
+    3: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 3",
+            image: "images/jour03-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 3",
+            image: "images/jour03-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 3",
+            image: "images/jour03-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 4
+    // ==================================================
+
+    4: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 4",
+            image: "images/jour04-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 4",
+            image: "images/jour04-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 4",
+            image: "images/jour04-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 5
+    // ==================================================
+
+    5: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 5",
+            image: "images/jour05-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 5",
+            image: "images/jour05-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 5",
+            image: "images/jour05-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 6
+    // ==================================================
+
+    6: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 6",
+            image: "images/jour06-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 6",
+            image: "images/jour06-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 6",
+            image: "images/jour06-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 7
+    // ==================================================
+
+    7: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 7",
+            image: "images/jour07-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 7",
+            image: "images/jour07-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 7",
+            image: "images/jour07-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 8
+    // ==================================================
+
+    8: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 8",
+            image: "images/jour08-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 8",
+            image: "images/jour08-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 8",
+            image: "images/jour08-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 9
+    // ==================================================
+
+    9: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 9",
+            image: "images/jour09-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 9",
+            image: "images/jour09-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 9",
+            image: "images/jour09-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 10
+    // ==================================================
+
+    10: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 10",
+            image: "images/jour10-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 10",
+            image: "images/jour10-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 10",
+            image: "images/jour10-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 11
+    // ==================================================
+
+    11: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 11",
+            image: "images/jour11-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 11",
+            image: "images/jour11-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 11",
+            image: "images/jour11-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 12
+    // ==================================================
+
+    12: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 12",
+            image: "images/jour12-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 12",
+            image: "images/jour12-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 12",
+            image: "images/jour12-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 13
+    // ==================================================
+
+    13: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 13",
+            image: "images/jour13-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 13",
+            image: "images/jour13-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 13",
+            image: "images/jour13-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 14
+    // ==================================================
+
+    14: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 14",
+            image: "images/jour14-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 14",
+            image: "images/jour14-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 14",
+            image: "images/jour14-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 15
+    // ==================================================
+
+    15: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 15",
+            image: "images/jour15-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 15",
+            image: "images/jour15-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 15",
+            image: "images/jour15-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 16
+    // ==================================================
+
+    16: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 16",
+            image: "images/jour16-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 16",
+            image: "images/jour16-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 16",
+            image: "images/jour16-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 17
+    // ==================================================
+
+    17: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 17",
+            image: "images/jour17-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 17",
+            image: "images/jour17-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 17",
+            image: "images/jour17-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 18
+    // ==================================================
+
+    18: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 18",
+            image: "images/jour18-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 18",
+            image: "images/jour18-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 18",
+            image: "images/jour18-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 19
+    // ==================================================
+
+    19: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 19",
+            image: "images/jour19-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 19",
+            image: "images/jour19-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 19",
+            image: "images/jour19-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 20
+    // ==================================================
+
+    20: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 20",
+            image: "images/jour20-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 20",
+            image: "images/jour20-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 20",
+            image: "images/jour20-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 21
+    // ==================================================
+
+    21: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 21",
+            image: "images/jour21-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 21",
+            image: "images/jour21-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 21",
+            image: "images/jour21-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 22
+    // ==================================================
+
+    22: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 22",
+            image: "images/jour22-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 22",
+            image: "images/jour22-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 22",
+            image: "images/jour22-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 23
+    // ==================================================
+
+    23: [
+
+        {
+            type: "Livres",
+            titre: "Titre du roman du jour 23",
+            image: "images/jour23-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Titre du manga du jour 23",
+            image: "images/jour23-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "Titre de la BD du jour 23",
+            image: "images/jour23-bd.jpg"
+        }
+
+    ],
+
+
+    // ==================================================
+    // JOUR 24
+    // ==================================================
+
+    24: [
+
+        {
+            type: "Livres",
+            titre: "Roman spécial Noël",
+            image: "images/jour24-roman.jpg"
+        },
+
+        {
+            type: "Manga",
+            titre: "Manga spécial Noël",
+            image: "images/jour24-manga.jpg"
+        },
+
+        {
+            type: "Romans Graphiques",
+            titre: "BD spéciale Noël",
+            image: "images/jour24-bd.jpg"
+        },
+
+        {
+            type: "SURPRISE",
+            titre: "Cadeau supplémentaire",
+            image: "images/jour24-surprise.jpg"
+        }
+
+    ]
+
+};
+
+
+
+// ======================================================
+// 3. DETERMINATION DU JOUR
+// ======================================================
+
+function obtenirJour() {
+
+
+    if (MODE_SIMULATION) {
+
+        return JOUR_SIMULE;
+
+    }
+
+
+    const parametres =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const jourURL =
+        Number(
+            parametres.get("jour")
+        );
+
+
+    if (
+        Number.isInteger(jourURL) &&
+        jourURL >= 1 &&
+        jourURL <= 24
+    ) {
+
+        return jourURL;
+
+    }
+
+
+    /*
+      Si aucun jour valide n'est présent dans l'URL,
+      on utilise le jour réel du mois de décembre.
+
+      Hors décembre, on utilise le jour 1.
+    */
+
+    const maintenant =
+        new Date();
+
+
+    if (
+        maintenant.getMonth() === 11 &&
+        maintenant.getDate() >= 1 &&
+        maintenant.getDate() <= 24
+    ) {
+
+        return maintenant.getDate();
+
+    }
+
+
+    return 1;
+
+}
+
+
+const JOUR =
+    obtenirJour();
+
+
+
+// ======================================================
+// 4. ELEMENTS HTML
+// ======================================================
+
+const jourBadge =
+    document.getElementById(
+        "jourBadge"
+    );
+
+
+const titreJour =
+    document.getElementById(
+        "titreJour"
+    );
+
+
+const cadeauxGrid =
+    document.getElementById(
+        "cadeauxGrid"
+    );
+
+
+const canvas =
+    document.getElementById(
+        "scratchCanvas"
+    );
+
+
+const ctx =
+    canvas.getContext(
+        "2d",
+        {
+            willReadFrequently: true
+        }
+    );
+
+
+const bouton =
+    document.getElementById(
+        "addBtn"
+    );
+
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+const progression =
+    document.getElementById(
+        "progression"
+    );
+
+
+const progressionTexte =
+    document.getElementById(
+        "progressionTexte"
+    );
+
+
+const progressionValeur =
+    document.getElementById(
+        "progressionValeur"
+    );
+
+
+const modeTest =
+    document.getElementById(
+        "modeTest"
+    );
+
+
+
+// ======================================================
+// 5. AFFICHAGE DU JOUR
+// ======================================================
+
+jourBadge.textContent =
+    "JOUR " + JOUR;
+
+
+titreJour.textContent =
+    "🎄 Surprise du jour " +
+    JOUR +
+    " 🎁";
+
+
+document.title =
+    "Calendrier de l'Avent - Jour " +
+    JOUR;
+
+
+if (MODE_SIMULATION) {
+
+    modeTest.style.display =
+        "block";
+
+}
+
+
+
+// ======================================================
+// 6. IMAGE DE REMPLACEMENT
+// ======================================================
+//
+// Si une image n'existe pas encore, une couverture
+// simple est créée automatiquement dans le navigateur.
+// ======================================================
+
+function creerImageRemplacement(
+    type,
+    titre
+) {
+
+
+    const couleurs = {
+
+        "Livres": "#8f263d",
+
+        "Manga": "#305c91",
+
+        "Romans Graphiques": "#9a6429",
+
+        "Jeux": "#5c3c91"
+    };
+
+
+    const couleur =
+        couleurs[type] ||
+        "#4c4c4c";
+
+
+    const texteType =
+        String(type || "CADEAU")
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            );
+
+
+    const texteTitre =
+        String(titre || "Surprise")
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            );
+
+
+    const svg = `
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="400"
+            height="600"
+            viewBox="0 0 400 600"
+        >
+
+            <rect
+                width="400"
+                height="600"
+                fill="${couleur}"
+            />
+
+            <circle
+                cx="200"
+                cy="165"
+                r="78"
+                fill="rgba(255,255,255,0.12)"
+            />
+
+            <text
+                x="200"
+                y="185"
+                text-anchor="middle"
+                font-family="Arial"
+                font-size="80"
+            >
+                🎁
+            </text>
+
+            <text
+                x="200"
+                y="315"
+                text-anchor="middle"
+                font-family="Arial"
+                font-size="30"
+                font-weight="bold"
+                fill="white"
+            >
+                ${texteType}
+            </text>
+
+            <foreignObject
+                x="35"
+                y="350"
+                width="330"
+                height="170"
+            >
+
+                <div
+                    xmlns="http://www.w3.org/1999/xhtml"
+                    style="
+                        color:white;
+                        font-family:Arial;
+                        font-size:25px;
+                        font-weight:bold;
+                        line-height:1.25;
+                        text-align:center;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        width:100%;
+                        height:100%;
+                    "
+                >
+                    ${texteTitre}
+                </div>
+
+            </foreignObject>
+
+        </svg>
+    `;
+
+
+    return (
+        "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(svg)
+    );
+
+}
+
+
+
+// ======================================================
+// 7. AFFICHAGE DES CADEAUX
+// ======================================================
+
+function afficherCadeaux() {
+
+
+    cadeauxGrid.innerHTML =
+        "";
+
+
+    const cadeaux =
+        CALENDRIER[JOUR] || [];
+
+
+    cadeauxGrid.className =
+        "cadeaux-grid nombre-" +
+        cadeaux.length;
+
+
+    if (cadeaux.length === 0) {
+
+
+        const message =
+            document.createElement(
+                "div"
+            );
+
+
+        message.className =
+            "aucun-cadeau";
+
+
+        message.textContent =
+            "Aucun cadeau n'est configuré pour ce jour.";
+
+
+        cadeauxGrid.appendChild(
+            message
+        );
+
+
+        return;
+
+    }
+
+
+    cadeaux.forEach(
+        function(cadeau) {
+
+
+            const carte =
+                document.createElement(
+                    "article"
+                );
+
+
+            carte.className =
+                "cadeau";
+
+
+
+            const imageWrapper =
+                document.createElement(
+                    "div"
+                );
+
+
+            imageWrapper.className =
+                "cadeau-image-wrapper";
+
+
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+
+            image.className =
+                "cadeau-image";
+
+
+            image.src =
+                cadeau.image;
+
+
+            image.alt =
+                "Couverture de " +
+                cadeau.titre;
+
+
+            image.loading =
+                "eager";
+
+
+            image.addEventListener(
+                "error",
+                function() {
+
+
+                    image.src =
+                        creerImageRemplacement(
+                            cadeau.type,
+                            cadeau.titre
+                        );
+
+                },
+                {
+                    once: true
+                }
+            );
+
+
+
+            const contenu =
+                document.createElement(
+                    "div"
+                );
+
+
+            contenu.className =
+                "cadeau-contenu";
+
+
+
+            const type =
+                document.createElement(
+                    "div"
+                );
+
+
+            type.className =
+                "cadeau-type";
+
+
+            type.textContent =
+                cadeau.type;
+
+
+
+            const titre =
+                document.createElement(
+                    "div"
+                );
+
+
+            titre.className =
+                "cadeau-titre";
+
+
+            titre.textContent =
+                cadeau.titre;
+
+
+
+            imageWrapper.appendChild(
+                image
+            );
+
+
+            contenu.appendChild(
+                type
+            );
+
+
+            contenu.appendChild(
+                titre
+            );
+
+
+            carte.appendChild(
+                imageWrapper
+            );
+
+
+            carte.appendChild(
+                contenu
+            );
+
+
+            cadeauxGrid.appendChild(
+                carte
+            );
+
+        }
+    );
+
+}
+
+
+afficherCadeaux();
+
+
+
+// ======================================================
+// 8. CREATION DU CALQUE A GRATTER
+// ======================================================
+
+function dessinerCalque() {
+
+
+    ctx.globalCompositeOperation =
+        "source-over";
+
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#d9d9d9"
+    );
+
+
+    gradient.addColorStop(
+        0.5,
+        "#a9a9a9"
+    );
+
+
+    gradient.addColorStop(
+        1,
+        "#d0d0d0"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+      Motif décoratif.
+    */
+
+    ctx.fillStyle =
+        "rgba(255,255,255,0.16)";
+
+
+    for (
+        let x = 35;
+        x < canvas.width;
+        x += 75
+    ) {
+
+
+        for (
+            let y = 35;
+            y < canvas.height;
+            y += 75
+        ) {
+
+
+            ctx.beginPath();
+
+
+            ctx.arc(
+                x,
+                y,
+                7,
+                0,
+                Math.PI * 2
+            );
+
+
+            ctx.fill();
+
+        }
+
+    }
+
+
+    /*
+      Texte principal.
+    */
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.font =
+        "bold 62px Arial";
+
+
+    ctx.fillText(
+        "✨ GRATTE ICI ✨",
+        canvas.width / 2,
+        canvas.height / 2 - 60
+    );
+
+
+    ctx.font =
+        "32px Arial";
+
+
+    ctx.fillText(
+        "Découvre les cadeaux du jour " +
+        JOUR,
+        canvas.width / 2,
+        canvas.height / 2 + 20
+    );
+
+
+    ctx.font =
+        "25px Arial";
+
+
+    ctx.fillText(
+        "Gratte au moins 75 % de la surface",
+        canvas.width / 2,
+        canvas.height / 2 + 78
+    );
+
+}
+
+
+dessinerCalque();
+
+
+
+// ======================================================
+// 9. VARIABLES DU GRATTAGE
+// ======================================================
+
+let grattageActif =
+    false;
+
+
+let carteRevelee =
+    false;
+
+
+let deblocageEnCours =
+    false;
+
+
+let cadeauxDebloques =
+    false;
+
+
+let compteurMouvements =
+    0;
+
+
+const totalPixels =
+    canvas.width *
+    canvas.height;
+
+
+
+// ======================================================
+// 10. POSITION DU POINTEUR
+// ======================================================
+
+function obtenirPosition(event) {
+
+
+    const rectangle =
+        canvas.getBoundingClientRect();
+
+
+    let clientX;
+
+    let clientY;
+
+
+    if (
+        event.touches &&
+        event.touches.length > 0
+    ) {
+
+
+        clientX =
+            event.touches[0].clientX;
+
+
+        clientY =
+            event.touches[0].clientY;
+
+    }
+
+
+    else {
+
+
+        clientX =
+            event.clientX;
+
+
+        clientY =
+            event.clientY;
+
+    }
+
+
+    if (
+        typeof clientX !== "number" ||
+        typeof clientY !== "number"
+    ) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        x:
+            (clientX - rectangle.left) *
+            (
+                canvas.width /
+                rectangle.width
+            ),
+
+        y:
+            (clientY - rectangle.top) *
+            (
+                canvas.height /
+                rectangle.height
+            )
+
+    };
+
+}
+
+
+
+// ======================================================
+// 11. GRATTAGE
+// ======================================================
+
+function gratter(event) {
+
+
+    if (
+        !grattageActif ||
+        carteRevelee
+    ) {
+
+        return;
+
+    }
+
+
+    const position =
+        obtenirPosition(event);
+
+
+    if (!position) {
+
+        return;
+
+    }
+
+
+    ctx.globalCompositeOperation =
+        "destination-out";
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        position.x,
+        position.y,
+        58,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+
+    compteurMouvements++;
+
+
+    /*
+      On ne recalcule pas tous les pixels à chaque
+      mouvement. Cela améliore les performances
+      sur téléphone.
+    */
+
+    if (
+        compteurMouvements % 5 === 0
+    ) {
+
+        verifierProgression();
+
+    }
+
+}
+
+
+
+// ======================================================
+// 12. VERIFICATION DE LA PROGRESSION
+// ======================================================
+
+function verifierProgression() {
+
+
+    if (carteRevelee) {
+
+        return;
+
+    }
+
+
+    const pixels =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+    let pixelsEffaces =
+        0;
+
+
+    /*
+      On examine un pixel sur quatre pour rendre
+      le calcul plus léger.
+    */
+
+    for (
+        let i = 3;
+        i < pixels.data.length;
+        i += 16
+    ) {
+
+
+        if (
+            pixels.data[i] <
+            128
+        ) {
+
+            pixelsEffaces++;
+
+        }
+
+    }
+
+
+    const pixelsExamines =
+        pixels.data.length /
+        16;
+
+
+    const pourcentage =
+        Math.min(
+            100,
+            Math.round(
+                (
+                    pixelsEffaces /
+                    pixelsExamines
+                ) *
+                100
+            )
+        );
+
+
+    progressionTexte.textContent =
+        pourcentage + " %";
+
+
+    progressionValeur.style.width =
+        pourcentage + "%";
+
+
+    if (
+        pourcentage >=
+        SEUIL_GRATTAGE * 100
+    ) {
+
+        revelerCarte();
+
+    }
+
+}
+
+
+
+// ======================================================
+// 13. REVELATION COMPLETE
+// ======================================================
+
+function revelerCarte() {
+
+
+    if (carteRevelee) {
+
+        return;
+
+    }
+
+
+    carteRevelee =
+        true;
+
+
+    progressionTexte.textContent =
+        "100 %";
+
+
+    progressionValeur.style.width =
+        "100%";
+
+
+    canvas.style.transition =
+        "opacity 0.6s ease";
+
+
+    canvas.style.opacity =
+        "0";
+
+
+    setTimeout(
+        function() {
+
+
+            canvas.style.display =
+                "none";
+
+
+        },
+        650
+    );
+
+
+    bouton.style.display =
+        "block";
+
+
+    status.className =
+        "status-success";
+
+
+    status.textContent =
+        "✨ Surprise découverte ! Tu peux maintenant débloquer tes cadeaux.";
+
+}
+
+
+
+// ======================================================
+// 14. EVENEMENTS SOURIS
+// ======================================================
+
+canvas.addEventListener(
+    "mousedown",
+    function(event) {
+
+
+        grattageActif =
+            true;
+
+
+        gratter(event);
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mousemove",
+    gratter
+);
+
+
+window.addEventListener(
+    "mouseup",
+    function() {
+
+
+        grattageActif =
+            false;
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mouseleave",
+    function() {
+
+
+        grattageActif =
+            false;
+
+    }
+);
+
+
+
+// ======================================================
+// 15. EVENEMENTS TACTILES
+// ======================================================
+
+canvas.addEventListener(
+    "touchstart",
+    function(event) {
+
+
+        grattageActif =
+            true;
+
+
+        gratter(event);
+
+
+        event.preventDefault();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+canvas.addEventListener(
+    "touchmove",
+    function(event) {
+
+
+        gratter(event);
+
+
+        event.preventDefault();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+window.addEventListener(
+    "touchend",
+    function() {
+
+
+        grattageActif =
+            false;
+
+    }
+);
+
+
+
+// ======================================================
+// 16. APPEL GOOGLE APPS SCRIPT
+// ======================================================
+
+async function debloquerCadeaux() {
+
+
+    if (
+        deblocageEnCours ||
+        cadeauxDebloques
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !APPS_SCRIPT_URL ||
+        APPS_SCRIPT_URL.includes(
+            "https://script.google.com/macros/s/AKfycbzv46E7l3wh1kfEvHWB7ikp46Z71In4eEZpbQuQtaeDkEq2T2K8wD09wvx76AVbtavH/exec"
+        )
+    ) {
+
+
+        status.className =
+            "status-error";
+
+
+        status.textContent =
+            "❌ L'URL Google Apps Script n'est pas configurée.";
+
+
+        return;
+
+    }
+
+
+    deblocageEnCours =
+        true;
+
+
+    bouton.disabled =
+        true;
+
+
+    bouton.textContent =
+        "⏳ Déblocage en cours...";
+
+
+    status.className =
+        "status-info";
+
+
+    status.textContent =
+        "🎁 Déplacement et préparation des cadeaux...";
+
+
+    try {
+
+
+        const reponse = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            redirect: "follow",
+            body: JSON.stringify({
+                jour: JOUR
+            })
+        });
+
+
+        if (!reponse.ok) {
+
+
+            throw new Error(
+                "Erreur HTTP " +
+                reponse.status
+            );
+
+        }
+
+
+        const donnees =
+            await reponse.json();
+
+
+        console.log(
+            "Réponse Apps Script :",
+            donnees
+        );
+
+
+        const nombreDebloques =
+            Number(
+                donnees.nombreDebloques ||
+                0
+            );
+
+
+        const nombreErreurs =
+            Number(
+                donnees.nombreErreurs ||
+                0
+            );
+
+
+        if (
+            nombreDebloques <= 0
+        ) {
+
+
+            throw new Error(
+                donnees.message ||
+                "Aucun cadeau n'a pu être débloqué."
+            );
+
+        }
+
+
+        cadeauxDebloques =
+            true;
+
+
+        status.className =
+            "status-success";
+
+
+        if (
+            nombreErreurs > 0
+        ) {
+
+
+            status.textContent =
+                "⚠️ " +
+                nombreDebloques +
+                " cadeau(x) débloqué(s), mais " +
+                nombreErreurs +
+                " fichier(s) ont rencontré une erreur.";
+
+        }
+
+
+        else {
+
+
+            status.textContent =
+                "✨ " +
+                nombreDebloques +
+                " cadeau(x) débloqué(s) avec succès !";
+
+        }
+
+
+        bouton.textContent =
+            "✅ Cadeaux débloqués";
+
+
+        setTimeout(
+            function() {
+
+
+                bouton.style.display =
+                    "none";
+
+
+            },
+            1800
+        );
+
+    }
+
+
+    catch(error) {
+
+
+        console.error(
+            "Erreur de déblocage :",
+            error
+        );
+
+
+        status.className =
+            "status-error";
+
+
+        status.textContent =
+            "❌ Impossible de débloquer les cadeaux : " +
+            error.message;
+
+
+        bouton.disabled =
+            false;
+
+
+        bouton.textContent =
+            "🔄 Réessayer";
+
+    }
+
+
+    finally {
+
+
+        deblocageEnCours =
+            false;
+
+    }
+
+}
+
+
+bouton.addEventListener(
+    "click",
+    debloquerCadeaux
+);
+
+
+</script>
+
+
+</body>
+
+</html>
